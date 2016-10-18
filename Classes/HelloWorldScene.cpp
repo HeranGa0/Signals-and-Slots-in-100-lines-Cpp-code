@@ -1,7 +1,9 @@
 #include "HelloWorldScene.h"
+#include"HNPCTexts.h"
 #define H_ABSOLUTE(x)\
 if((x)<=0) x=-x
-
+// when many scenes here might be a mistake
+static CCSprite*textBox=NULL;
 
 USING_NS_CC;
 
@@ -14,7 +16,19 @@ CCScene* HelloWorld2::scene()
     HelloWorld2 *layer = HelloWorld2::create();
 
     // add layer as a child to scene
-    scene->addChild(layer);
+	scene->addChild(layer->getParent());
+	if(!textBox)
+	{
+		textBox=CCSprite::create("textBox.png");
+		textBox->retain();
+		layer->getParent()->addChild(textBox);
+		textBox->setPosition(ccp(190,140));
+		textBox->setScale(0.4f);
+		textBox->setVisible(false);
+		
+		
+	}
+	
 
     // return the scene
     return scene;
@@ -23,22 +37,35 @@ CCScene* HelloWorld2::scene()
 // on "init" you need to initialize your instance
 bool HelloWorld2::init()
 {
+
     //////////////////////////////
     // 1. super init first
     if ( !CCLayer::init() )
     {
         return false;
     }
+	
+	CCNode*layerParent=CCNode::create();
+	layerParent->addChild(this);
+	layerParent->retain();
 	//this->setPosition(50,100);
     CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+	//CCSprite* textBox=CCSprite::create("textBox.png");
+	//addChild(textBox,5,233);
+	//textBox->setPosition(ccp(300,200));
+	//textBox->setScale(0.6);
 	map1=TmxLayer::create();
-	//map1->retain();
+	 
+		
+		// addChild(left,9);
+		// left->setPosition(ccp(100,100));
+		 //left->setVisible(false);
 	map1->retain();
 	int uy=1; int iu=-1;
 	H_ABSOLUTE(uy);
 	H_ABSOLUTE(iu);
-	
+	this->getParent()->getPosition();
 	map1->setMapPath("trial2.tmx");  
 	CCTMXTiledMap*map=map1->getMap();
 	addChild(map,0,998);  
@@ -85,6 +112,24 @@ bool HelloWorld2::init()
 	points[7]=ccp(100,250);
 
 	NPC1->setNPCMovement(points);
+	const char* tr[4]={"Hello","my","name","is"};
+	CCArray*texts=CCArray::create();
+	auto createTexts=[texts]( const char*  *textsArray){
+		for(int count=0;count<=3;count++)
+		{
+			CCLabelTTF* content= CCLabelTTF::create(textsArray[count], "A Damn Mess.ttf", 26,  
+                                          CCSize(200,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter); 
+			texts->addObject(content);
+		}
+	};
+	createTexts(tr);
+	/* CCLabelTTF *left = CCLabelTTF::create("Heran Gao", "A Damn Mess.ttf", 26,  
+                                          CCSize(200,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter);  
+	  CCLabelTTF *right = CCLabelTTF::create("Heran ", "A Damn Mess.ttf", 26,  
+                                          CCSize(200,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter);
+	  texts->addObject(left);
+	  texts->addObject(right);*/
+	  NPC1->setTextContentByArray(texts);
 		//ccp(250,250),ccp(300,250),ccp(300,200),ccp(250,200));
    
     
@@ -104,11 +149,29 @@ void HelloWorld2::onExit()
 }
 bool HelloWorld2::ccTouchBegan(CCTouch*touch,CCEvent*event)
 {
-	if((touch->getLocation().getDistance(NPC1->getPosition()))<=40)
-	{
-		mainCharacter->stopForConversation(NPC1);
+	
+
+	if(NPC1->iSConservationOn())
+	{    
+		
+			NPC1->setTextOffBox(textBox);
+		
+			NPC1->setTextIntoBox(textBox);
+				
+			
+		
+		return true;
+	}
+	if(((touch->getLocation().getDistance(NPC1->getPosition()))<=30)
+		&&mainCharacter->getPosition().getDistance(NPC1->getPosition())<=60)
+	{   //here is the problem:
+		mainCharacter->stopForConversation(NPC1,textBox);
+		
+		
+		
 		return false;
 	}
+	textBox->setVisible(false);
 	CCPoint t=touch->getLocation();
 	unschedule(SEL_SCHEDULE(&HelloWorld2::myUpdate));
 	 schedule(SEL_SCHEDULE(&HelloWorld2::myUpdate),0.01f);

@@ -1,5 +1,5 @@
 #include"HCharacters.h"
-
+#include"HNPCTexts.h"
 
 
 bool HCharactersBase::init(void)
@@ -9,6 +9,7 @@ bool HCharactersBase::init(void)
 		return false;
 	}
 	texture=NULL;
+	
 	return true;
 }
 
@@ -154,6 +155,7 @@ void HCharactersBase::setInitialTexture()
 	CCSpriteFrame* sub=(CCSpriteFrame*)TextureSpriteFrame->objectAtIndex(0);
 	this->setTexture(sub->getTexture());
 	this->setTextureRect(sub->getRect());
+	
 
 }
 
@@ -210,15 +212,17 @@ CCActionInterval* MainCharacter::walkingAnimation(CCPoint clickPoint, CCPoint cu
 }
 
 
-void MainCharacter::stopForConversation(HCharactersBase*target)
+void MainCharacter::stopForConversation(HCharactersBase*target,CCSprite*textBox)
 {
 	CCPoint mCh=this->getPosition();
 	CCPoint targetPos=target->getPosition();
-	if(mCh.getDistance(targetPos)<=30)
-	{
+	
+	
 		this->stopAllActions();
 		target->stopAllActions();
-	}
+		((NPC*)target)->ifSetConversationOn(true);
+		((NPC*)target)->setTextIntoBox(textBox);
+	
 }
 
 
@@ -321,11 +325,116 @@ bool NPC::init(void)
 	{
 		return false;
 	}
+	//textGroup=CCArray::create();
+	//textGroup->retain();
+	count=-1;
+	_ifBoxOn=false;
 	
+	_ifOnConversation=false;
+	Maidd *sam=new Maidd();
+	textGroup=sam->sendTextsArray();
 	return true;
-
 }
 
+void NPC::setTextContentByArray(CCArray* content)
+{  //this->getParent()->addChild(textBox,0);
+	//textGroup->addObjectsFromArray(content);
+	
+	CCObject*son=NULL;
+	CCObject*grandson=NULL;
+	CCARRAY_FOREACH(textGroup,son)
+	{
+		CCArray*texts=(CCArray*)son;
+		
+		int yDistance=150;
+		CCARRAY_FOREACH(texts,grandson)
+		{
+			CCLabelTTF*final=(CCLabelTTF*)grandson;
+		//final->retain();
+		final->setPosition(ccp(240,yDistance));
+		yDistance-=10;
+		final->setScale(0.5);
+		final->setVisible(false);
+		CCLayer*y1=(CCLayer*)( this->getParent());
+		
+		CCNode*y2=(CCNode*)(y1->getParent());
+		y2->getPosition();
+		y2->addChild(final,10);
+		
+		
+	}
+	    count++;
+	}
+	scale=count;
+}
+
+void NPC::setTextIntoBox(CCSprite*textBox)
+{
+	if((count)!=-1)
+	{
+		CCObject*sub=NULL;
+		CCARRAY_FOREACH((CCArray*)(textGroup->objectAtIndex(scale-count)),sub)
+	{
+		CCLabelTTF* rece=(CCLabelTTF*)sub;
+		rece->setVisible(true);
+	}
+		
+	//((CCLabelTTF*)(textGroup->objectAtIndex(scale-count)))->setVisible(true);
+	_ifBoxOn=true;
+	textBox->setVisible(true);
+	
+	}
+	else
+	{
+		ifSetConversationOn(false);
+		count=scale;
+		
+	}
+}
+
+bool NPC::ifAndSetBoxStatus()
+{
+	if(_ifBoxOn)
+	{
+		
+		return true;
+	}
+	else
+	{
+		
+		return false;
+	}
+}
+
+void NPC::setTextOffBox(CCSprite*textBox)
+{
+	CCObject*sub=NULL;
+		CCARRAY_FOREACH((CCArray*)(textGroup->objectAtIndex(scale-count)),sub)
+	{
+		CCLabelTTF* rece=(CCLabelTTF*)sub;
+		rece->setVisible(false);
+	}
+	count--;
+	textBox->setVisible(false);
+	_ifBoxOn=false;
+}
+
+void NPC::ifSetConversationOn(bool ifOn)
+{
+	if(ifOn)
+	{
+		_ifOnConversation=true;
+	}
+	else
+	{
+		_ifOnConversation=false;
+	}
+}
+
+bool NPC::iSConservationOn()
+{
+	return _ifOnConversation;
+}
 /*void NPC::clickOnNPC(CCSprite*mainCharacter)
 {
 

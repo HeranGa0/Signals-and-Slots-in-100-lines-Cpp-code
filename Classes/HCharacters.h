@@ -100,7 +100,7 @@ public:
 	virtual bool init(void);
 	CCActionInterval* walkingAnimation(CCPoint clickPoint, CCPoint currentPoint,int groupNum);
 
-	void stopForConversation(HCharactersBase*target);
+	void stopForConversation(HCharactersBase*target,CCSprite*textBox);
 	
 private:
 	enum Direction
@@ -128,7 +128,22 @@ public:
 	}*/
 	//void clickOnNPC(CCSprite*mainCharacter);
 	 CREATE_FUNC(NPC);
+
+    CCArray* textGroup;
+	void setTextIntoBox(CCSprite*textBox);
+	void setTextContentByArray(CCArray* content );
+	void setTextOffBox(CCSprite*textBox);
+	bool ifAndSetBoxStatus();
+	int count;
+	int scale;
+	bool _ifBoxOn;
+	bool _ifOnConversation;
+	void ifSetConversationOn(bool On);
+	bool iSConservationOn();
 private:
+	
+	
+
 };
 
 
