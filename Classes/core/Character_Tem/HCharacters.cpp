@@ -1,5 +1,6 @@
 #include"HCharacters.h"
-#include"HNPCTexts.h"
+
+
 
 
 bool HCharactersBase::init(void)
@@ -54,16 +55,11 @@ void HCharactersBase::addImageUsingTextureCache( const char * cPath)
 	walkRight->retain();
 	walkUp=CCArray::create();
 	walkUp->retain();
-	
-	
-
 	//!!!!!!!!!!!!!!!!!!!!!!
-	
 }
 
 CCArray* HCharactersBase::insertTextureSpriteFrames(float width,float height,int row,int column)
 {
-	
 	for(int rCount=0;rCount<=row-1;rCount++)
 	{
 		for(int cCount=0;cCount<=column-1;cCount++)
@@ -80,15 +76,11 @@ CCArray* HCharactersBase::insertTextureSpriteFrames(float width,float height,int
 			
 		}
 		sub->addObject(TextureSpriteFrame->objectAtIndex(n-column));};
-		
-	
-	
-	forWalk(walkDown);
 
+	forWalk(walkDown);
 	forWalk(walkLeft);
 	forWalk(walkRight);
 	forWalk(walkUp);
-	
 	return this->TextureSpriteFrame;
 }
 
@@ -102,9 +94,9 @@ int HCharactersBase::directionCal(CCPoint currentPos,CCPoint targetPos)
 			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))>=1)
 			{
 				direction=3;
-
 			}
-			else{
+			else
+			{
 				direction=4;
 			}
 		}
@@ -112,24 +104,23 @@ int HCharactersBase::directionCal(CCPoint currentPos,CCPoint targetPos)
 			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))<=-1)
 			{
 				direction=3;
-
 			}
-			else{
+			else
+			{
 				direction=1;
 			}
 		}
-	    
-
-		}
+	  }
+	
 	else{
 		if(targetPos.y>= currentPos.y)
 		{
 			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))<=-1)
 			{
 				direction=2;
-
 			}
-			else{
+			else
+			{
 				direction=4;
 			}
 		}
@@ -137,14 +128,11 @@ int HCharactersBase::directionCal(CCPoint currentPos,CCPoint targetPos)
 			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))>=1)
 			{
 				direction=2;
-
 			}
 			else{
 				direction=1;
 			}
-		}
-
-	    
+		} 
 	}
 	return direction;
 }
@@ -155,8 +143,6 @@ void HCharactersBase::setInitialTexture()
 	CCSpriteFrame* sub=(CCSpriteFrame*)TextureSpriteFrame->objectAtIndex(0);
 	this->setTexture(sub->getTexture());
 	this->setTextureRect(sub->getRect());
-	
-
 }
 
 
@@ -170,8 +156,6 @@ CCArray* HCharactersBase::obtainDirection(int num)
 	case 4: return walkUp;
 	default: return NULL;
 	}
-	
-	
 }
 
 
@@ -192,16 +176,6 @@ CCActionInterval* MainCharacter::walkingAnimation(CCPoint clickPoint, CCPoint cu
 	if(reciever)reciever->removeAllObjects();
 	int direction;// down=1,left=2,right=3,up=4
 	direction=directionCal(currentPoint,clickPoint);
-	/*for(int count=1;count<=groupNum;count++)
-	{   
-	
-		reciever->addObject((TextureSpriteFrame->objectAtIndex((direction-1)*groupNum+count-1)));
-	//reciever->addObject((TextureSpriteFrame->objectAtIndex((direction-1)*3+1)));
-	//reciever->addObject((TextureSpriteFrame->objectAtIndex((direction-1)*3+2)));
-	//reciever->addObject((TextureSpriteFrame->objectAtIndex((direction-1)*4+3)));
-	}*/
-	
-	
 	CCAnimation *animation = CCAnimation::createWithSpriteFrames(obtainDirection(direction), 0.2f);
     CCAnimate *animate = CCAnimate::create(animation);
     CCActionInterval* seq = CCSequence::create( animate,NULL);
@@ -216,24 +190,38 @@ void MainCharacter::stopForConversation(HCharactersBase*target,CCSprite*textBox)
 {
 	CCPoint mCh=this->getPosition();
 	CCPoint targetPos=target->getPosition();
-	
-	
-		this->stopAllActions();
-		target->stopAllActions();
-		((NPC*)target)->ifSetConversationOn(true);
-		((NPC*)target)->setTextIntoBox(textBox);
-	
+	this->stopAllActions();
+	target->stopAllActions();
+	((NPC*)target)->ifSetConversationOn(true);
+	((NPC*)target)->setTextIntoBox(textBox);
 }
 
 
-bool NPC::setNPCMovement(std::vector<CCPoint> posGroup)
+bool NPC::setNPCMovement(CCPoint a,...)
 	//(CCSprite*NPC, CCPoint tLeft,CCPoint tRight,CCPoint bRight,CCPoint bLeft)
 {
 	CCActionInterval*blank=CCActionInterval::create(2.0f);
 	CCArray* actionGroup=CCArray::create();
-	for(std::vector<CCPoint>::const_iterator iter=posGroup.begin();iter!=posGroup.end()-1;iter++)
-	{
-		CCPoint cPos=*iter;
+	CCPoint substitute=a;
+	 va_list cvar;  
+    va_start (cvar, a);
+	
+	auto actionCreate=[this,actionGroup,blank](CCPoint cPos,CCPoint tPos){
+		float speed=tPos.getDistance(cPos)/80;
+		CCArray *moveFrames=obtainDirection(directionCal(cPos,tPos));
+		CCActionInterval*moveTo=CCMoveTo::create(speed,tPos);
+		CCAnimation*animation=CCAnimation::createWithSpriteFrames(moveFrames,0.2);
+		CCAnimate*animate=CCAnimate::create(animation);
+		int times=moveTo->getDuration()/animate->getDuration()+1;
+		CCRepeat*repeat=CCRepeat::create(animate,times);
+		moveTo->setDuration(times*animate->getDuration());
+		CCSpawn*spawn=CCSpawn::create(moveTo,repeat,NULL);
+		//moveTo,repeat,stopWalking,NULL);
+		actionGroup->addObject(spawn);
+		actionGroup->addObject(blank);
+
+	};
+		/*CCPoint cPos=*iter;
 		CCPoint tPos=*(iter+1);
 		
 		float speed=tPos.getDistance(cPos)/80;
@@ -303,7 +291,20 @@ bool NPC::setNPCMovement(std::vector<CCPoint> posGroup)
 	CCSpawn* pDown=CCSpawn::create(walkToDown,animateD,NULL);
 	CCSpawn* pLeft=CCSpawn::create(walkToLeft,animateL,NULL);
 	CCSpawn* pUp=CCSpawn::create(walkToUp,animateU,NULL);*/
-
+		while(1)
+		{
+			CCPoint ref=va_arg(cvar,CCPoint);
+			if(ref.equals(a))
+			{
+				va_end(cvar);
+				break;
+			}
+			actionCreate(substitute,ref);
+			substitute=ref;
+		}
+	
+	actionCreate(substitute,a);
+	
 	if(NULL==this)
 	{
 		return false;
@@ -314,32 +315,24 @@ bool NPC::setNPCMovement(std::vector<CCPoint> posGroup)
 	this->runAction(action);
 
 	return true;
-
-
-	
 }
 
-bool NPC::init(void)
+bool NPC::init(trial* NPCname)
 {
 	if(!HCharactersBase::init())
 	{
 		return false;
 	}
-	//textGroup=CCArray::create();
-	//textGroup->retain();
+	H_delete=NPCname;
 	count=-1;
 	_ifBoxOn=false;
-	
 	_ifOnConversation=false;
-	Maidd *sam=new Maidd();
-	textGroup=sam->sendTextsArray();
+	textGroup=NPCname->sendTextsArray();
 	return true;
 }
 
-void NPC::setTextContentByArray(CCArray* content)
-{  //this->getParent()->addChild(textBox,0);
-	//textGroup->addObjectsFromArray(content);
-	
+void NPC::setTextContentByArray()
+{  
 	CCObject*son=NULL;
 	CCObject*grandson=NULL;
 	CCARRAY_FOREACH(textGroup,son)
@@ -350,19 +343,15 @@ void NPC::setTextContentByArray(CCArray* content)
 		CCARRAY_FOREACH(texts,grandson)
 		{
 			CCLabelTTF*final=(CCLabelTTF*)grandson;
-		//final->retain();
-		final->setPosition(ccp(240,yDistance));
-		yDistance-=10;
-		final->setScale(0.5);
-		final->setVisible(false);
-		CCLayer*y1=(CCLayer*)( this->getParent());
-		
-		CCNode*y2=(CCNode*)(y1->getParent());
-		y2->getPosition();
-		y2->addChild(final,10);
-		
-		
-	}
+			final->setPosition(ccp(240,yDistance));
+			yDistance-=10;
+			final->setScale(0.5);
+			final->setVisible(false);
+			CCLayer*y1=(CCLayer*)( this->getParent());
+			CCNode*y2=(CCNode*)(y1->getParent());
+			y2->getPosition();
+			y2->addChild(final,10);
+		}
 	    count++;
 	}
 	scale=count;
@@ -374,21 +363,17 @@ void NPC::setTextIntoBox(CCSprite*textBox)
 	{
 		CCObject*sub=NULL;
 		CCARRAY_FOREACH((CCArray*)(textGroup->objectAtIndex(scale-count)),sub)
-	{
-		CCLabelTTF* rece=(CCLabelTTF*)sub;
-		rece->setVisible(true);
-	}
-		
-	//((CCLabelTTF*)(textGroup->objectAtIndex(scale-count)))->setVisible(true);
+		{
+			CCLabelTTF* rece=(CCLabelTTF*)sub;
+			rece->setVisible(true);
+		}
 	_ifBoxOn=true;
 	textBox->setVisible(true);
-	
 	}
 	else
 	{
 		ifSetConversationOn(false);
 		count=scale;
-		
 	}
 }
 
@@ -396,12 +381,10 @@ bool NPC::ifAndSetBoxStatus()
 {
 	if(_ifBoxOn)
 	{
-		
 		return true;
 	}
 	else
 	{
-		
 		return false;
 	}
 }
@@ -435,7 +418,3 @@ bool NPC::iSConservationOn()
 {
 	return _ifOnConversation;
 }
-/*void NPC::clickOnNPC(CCSprite*mainCharacter)
-{
-
-}*/

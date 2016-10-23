@@ -15,7 +15,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     // create the application instance
     AppDelegate app;
     CCEGLView* eglView = CCEGLView::sharedOpenGLView();
-    eglView->setViewName("MyFirst");
+    eglView->setViewName("ccRPG_Template");
     eglView->setFrameSize(640, 480);
     return CCApplication::sharedApplication()->run();
 }

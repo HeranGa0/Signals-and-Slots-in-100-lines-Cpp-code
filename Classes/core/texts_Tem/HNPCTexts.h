@@ -18,8 +18,6 @@ public:\
 #define SETTEXT setRTextsArray()
 #define ADD_NEW setSubTextsArray
 
-
-
 class trial
 {
 public:
@@ -64,17 +62,16 @@ public:
 		parent->addObject(sub);
 	}
 	virtual ~trial(){};
+
 protected:
 	CCArray* parent;
 };
 
-
+//example of how to use text-setting
 NEW_CHARACTOR_TEXTS(Maidd);
 $ Maidd::SETTEXT{
-	ADD_NEW("Hello,I am Heran,haha ok I'll help you",NULL);
-	ADD_NEW("Turn right to the restroom",NULL);
-	
-
+	ADD_NEW("Example of cocos2d-RPG-Template @ Heran Gao",NULL);
+	ADD_NEW("is there anything I can help with?",NULL);
 }
 
 

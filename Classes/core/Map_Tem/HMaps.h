@@ -74,7 +74,6 @@ public:
     {
         return false;
     }
-		//obstacles=CCArray::create();
 		return true;
 	}
 
@@ -88,8 +87,6 @@ public:
 		mW=(map->getMapSize().width)*(map->getTileSize().width);
 		obstacles=CCArray::create();
 		obstacles->retain();
-	
-		
 	}
 
 	void setAntiAliasforMapChildren();
@@ -122,22 +119,7 @@ private:
 	 CCArray*obstacles;
 	 float mW;
 	 float mH;
-	
-
-	
-
-	 
-	
 };
-
-
-
-
-
-
-
-
-
 
 
 

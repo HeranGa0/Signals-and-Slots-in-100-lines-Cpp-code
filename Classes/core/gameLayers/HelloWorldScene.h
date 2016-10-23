@@ -23,40 +23,30 @@ public:
 	virtual void onEnter();
 	virtual void onExit();
 	virtual bool ccTouchBegan(cocos2d::CCTouch* touch, cocos2d::CCEvent* event);
-
-
 	void judgeIfHitObstacles();
 
 	void actionFinished()
 	{
 		mainCharacter->stopActionByTag(01);
 		this->unschedule(SEL_SCHEDULE(&HelloWorld2::myUpdate));
-
 	}
 
 	void createCMovingAction(CCPoint currentPos,CCPoint targetPos);
-
-
 	void stopForConversation();
 	///!!!
 	CCPoint setViewPosition(CCPoint viewPos);
 	CCPoint view;
-
-	
 	CCArray *qiu;
+
 private:
 	
 	MainCharacter*mainCharacter;
 	TmxLayer* map1;
-	//CCSprite* mainCharacter;
-	
 	NPC*NPC1;
 	float saveX;
 	float saveY;
 	float cSpeed;
 	void myUpdate(float m);
-	//std::vector<CCPoint> points;
-
 };
 
 #endif // __HELLOWORLD_SCENE_H2__

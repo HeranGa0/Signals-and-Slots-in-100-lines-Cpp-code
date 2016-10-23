@@ -1,7 +1,7 @@
 #ifndef __H_CHARACTERS_H__
 #define __H_CHARACTERS_H__
 #include"cocos2d.h"
-
+#include"HNPCTexts.h"
 using namespace cocos2d;
 
 class HCharactersBase:public CCSprite
@@ -15,7 +15,6 @@ public:
      {
         pRet->autorelease();
 		return pRet;
-		
 	 }
 		else
 	 {
@@ -51,24 +50,15 @@ public:
 
 	CCArray* obtainDirection(int num);
 	
-	
-
 protected:
     int directionCal(CCPoint currentPos, CCPoint targetPos);
 	CCTexture2D*texture;
-	
 	CCString *characPath;
-
-	
-
 	CCArray * TextureSpriteFrame;
-
-
 	CCArray *walkUp;
 	CCArray *walkDown;
 	CCArray *walkLeft;
 	CCArray*walkRight;
-
 };
 
 
@@ -84,41 +74,51 @@ public:
         {
            pRet->autorelease();
 		   return pRet;
-	
-        }
+		}
 		else
 		{
 			delete pRet;
 			pRet=NULL;
 			return NULL;
-
 		}
-
-   
 	}
 
 	virtual bool init(void);
 	CCActionInterval* walkingAnimation(CCPoint clickPoint, CCPoint currentPoint,int groupNum);
-
 	void stopForConversation(HCharactersBase*target,CCSprite*textBox);
 	
 private:
 	enum Direction
 	{up=0,down,left,right};
 	CCArray*reciever;
-	
-	
-
-
 };
 
 
 class NPC:public HCharactersBase
 {
 public:
-	virtual bool init(void);
+	
+	virtual bool init(trial*NPCname);
+
+	static NPC* create(trial*name)
+	{
+		NPC* pRet = new NPC();
+		
+		if (pRet != NULL&&pRet->init(name))
+        {
+           pRet->autorelease();
+		   return pRet;
+		 }
+
+		else
+		{
+			delete pRet;
+			pRet=NULL;
+			return NULL;
+		}
+	}
 	//(CCSprite*NPC,CCPoint tLeft,CCPoint tRight,CCPoint bRight,CCPoint bLeft);
-	 bool setNPCMovement(std::vector<CCPoint> posGroup);
+	 bool setNPCMovement(CCPoint a,...);
 		
 	/*void stopAction(CCNode*NPC1)
 	{
@@ -127,11 +127,10 @@ public:
 		NPCReceiver->stopAllActions();
 	}*/
 	//void clickOnNPC(CCSprite*mainCharacter);
-	 CREATE_FUNC(NPC);
-
-    CCArray* textGroup;
+	//CREATE_FUNC(NPC);
+	CCArray* textGroup;
 	void setTextIntoBox(CCSprite*textBox);
-	void setTextContentByArray(CCArray* content );
+	void setTextContentByArray();
 	void setTextOffBox(CCSprite*textBox);
 	bool ifAndSetBoxStatus();
 	int count;
@@ -140,10 +139,14 @@ public:
 	bool _ifOnConversation;
 	void ifSetConversationOn(bool On);
 	bool iSConservationOn();
-private:
-	
-	
 
+	~NPC()
+	{
+		CCSprite::CCSprite();
+		delete H_delete;
+	}
+private:
+	trial* H_delete;
 };
 
 

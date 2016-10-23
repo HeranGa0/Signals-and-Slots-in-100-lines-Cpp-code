@@ -71,7 +71,6 @@ CCArray* TmxLayer::addObstacle(const char*objectGroupName,const char*objectName)
 		
     int Uy=Dy+(((CCString*)obj->objectForKey("height"))->intValue());
 			
-	
 	AddiTionDictionary*limits=AddiTionDictionary::create();
 	limits->setCollisionLimit(Uy,Dy,Rx,Lx);
 	obj->setObject(limits,"limits");
@@ -84,9 +83,7 @@ CCArray* TmxLayer::addObstacles(const char*objectGroupName)
 {
 	
 	//!!!!!!!!!!
-	
 	CCTMXObjectGroup* objGroup = map->objectGroupNamed(objectGroupName); 
-	
 	
 	//add objects' limits of collision : up,down,left and right
 	CCObject*subject=NULL;
@@ -101,15 +98,14 @@ CCArray* TmxLayer::addObstacles(const char*objectGroupName)
 		
       int Uy=Dy+(((CCString*)obj->objectForKey("height"))->intValue());
 			
-	
 	  AddiTionDictionary*limits=AddiTionDictionary::create();
 	  limits->retain();
 	  limits->setCollisionLimit(Uy,Dy,Rx,Lx);
 	  obj->setObject(limits,"limits");
-	  
-	}
+	 }
+	
 	obstacles->addObjectsFromArray(objGroup->getObjects());
-	//obstacles->retain();
+	
 	return obstacles;
 }
 
