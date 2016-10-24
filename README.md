@@ -21,5 +21,6 @@ b.
 ##### update3:
         a. Largely simply the codes.
         b. Add some comments. 
-
+        
+![Alt text](HG-rpgTemplate/exampleCC.jpg?raw=true "Optional Title")
 
