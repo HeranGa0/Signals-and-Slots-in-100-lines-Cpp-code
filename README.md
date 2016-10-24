@@ -6,8 +6,8 @@ RPG game template based on cocos2d-c++
 
 #### important to know
 a. 
-  This project is just at the very begining of development, for why it is lack of most comments, references and testing.
-  However, I plan to do the complimentariness during this Thanksgiving break.
+  This project is just at the very beginning of development, for why it is lack of most comments, references and testing.
+  However, I plan to do the complementariness during this Thanksgiving break.
 b.
   This program is based on cocos2d-x-2.2.6
   
@@ -19,7 +19,7 @@ b.
         b. Delete several unuseful files.
         c. Rename some variables.
 ##### update3:
-        a. Largly simply the codes.
+        a. Largely simply the codes.
         b. Add some comments. 
 
 
