@@ -22,5 +22,5 @@ b.
         a. Largely simply the codes.
         b. Add some comments. 
         
-![Alt text](HG-rpgTemplate/exampleCC.jpg?raw=true "Optional Title")
+![Alt text](exampleCC.jpg?raw=true "Optional Title")
 
