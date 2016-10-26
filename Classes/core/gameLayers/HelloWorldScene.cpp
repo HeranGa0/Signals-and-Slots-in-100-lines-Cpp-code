@@ -75,23 +75,7 @@ bool HelloWorld2::init()
 	NPC1->setPosition(ccp(250,250));
 	addChild(NPC1,3,888);
 	NPC1->setNPCMovement(ccp(250,250),ccp(300,250),ccp(300,200),ccp(250,250));
-	/*const char* tr[4]={"Hello","my","name","is"};
-	CCArray*texts=CCArray::create();
-	auto createTexts=[texts]( const char*  *textsArray){
-		for(int count=0;count<=3;count++)
-		{
-			CCLabelTTF* content= CCLabelTTF::create(textsArray[count], "A Damn Mess.ttf", 26,  
-                                          CCSize(200,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter); 
-			texts->addObject(content);
-		}
-	};
-	createTexts(tr);*/
-	/* CCLabelTTF *left = CCLabelTTF::create("Heran Gao", "A Damn Mess.ttf", 26,  
-                                          CCSize(200,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter);  
-	  CCLabelTTF *right = CCLabelTTF::create("Heran ", "A Damn Mess.ttf", 26,  
-                                          CCSize(200,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter);
-	  texts->addObject(left);
-	  texts->addObject(right);*/
+	
 	NPC1->setTextContentByArray();
 		
 	return true;

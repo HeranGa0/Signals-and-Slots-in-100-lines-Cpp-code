@@ -26,17 +26,7 @@ public:
 
 	 virtual bool init(void);
 
-	/*static HCharactersBase* create(std::string cPath)
-	{
-		HCharactersBase* pRet = new HCharactersBase();
-    if (pRet != NULL)
-    {
-        pRet->autorelease();
-		pRet->characPath=CCString::create(cPath);
-		pRet->characPath->autorelease();
-    }
-    return pRet;
-	}*/
+	
 
 	void setCPath(std::string cPath);
 
@@ -120,14 +110,7 @@ public:
 	//(CCSprite*NPC,CCPoint tLeft,CCPoint tRight,CCPoint bRight,CCPoint bLeft);
 	 bool setNPCMovement(CCPoint a,...);
 		
-	/*void stopAction(CCNode*NPC1)
-	{
-		//(CCSprite*)NPC1->stopAllActions();
-		CCSprite*NPCReceiver= reinterpret_cast<CCSprite*>(NPC1);
-		NPCReceiver->stopAllActions();
-	}*/
-	//void clickOnNPC(CCSprite*mainCharacter);
-	//CREATE_FUNC(NPC);
+	
 	CCArray* textGroup;
 	void setTextIntoBox(CCSprite*textBox);
 	void setTextContentByArray();
