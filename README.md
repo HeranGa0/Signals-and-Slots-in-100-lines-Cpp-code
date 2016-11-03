@@ -22,6 +22,10 @@ b.
 ### update3:
    a. Largely simply the codes.
    b. Add some comments. 
+### update4:
+   a. Complete the comments for HCharactors.h and GameLayer.h.
+   b. Upload the InProgress file which includes HTests.h and HTests.cpp for new ideas practice.
+   
         
 ### A picture of this project:
 ![Alt text](exampleCC.jpg?raw=true "Optional Title")
