@@ -1,7 +1,7 @@
 #ifndef __H_MAPS_H_
 #define __H_MAPS_H_
 #include"cocos2d.h"
-#include"HCharacters.h"
+#include"HCharactors.h"
 using namespace cocos2d;
 class AddiTionDictionary: public CCDictionary
 {
