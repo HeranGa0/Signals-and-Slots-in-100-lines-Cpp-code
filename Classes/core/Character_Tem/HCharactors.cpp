@@ -1,135 +1,106 @@
 #include"HCharactors.h"
 
 
-
-
-bool HCharactorsBase::init(void)
+bool HCharactorsBase::initWithPictureList(const char* pictureListPath, float subWidth, float subHeight, int row, int column)
 {
-	if(!CCSprite::init())
+	if (!Sprite::init())
 	{
 		return false;
 	}
-	texture=NULL;
-	TextureSpriteFrame=CCArray::create();
-	TextureSpriteFrame->retain();
-	walkDown=CCArray::create();
-	walkDown->retain();
-	walkLeft=CCArray::create();
-	walkLeft->retain();
-	walkRight=CCArray::create();
-	walkRight->retain();
-
+	texture = NULL;
+	addImageUsingTextureCache(pictureListPath);
+	insertTextureSpriteFrames(subWidth, subHeight, row, column);
+	setInitialTexture();
+	setAnimationVector();
+	setAnchorPoint(Vec2(0.5, 0.5));
+	setScale(0.8f);
 	return true;
 }
 
-void HCharactorsBase::setCPath(std::string cPath)
+void HCharactorsBase::addImageUsingTextureCache(const char * cPath)
 {
-	characPath=CCString::create(cPath);
-	characPath->retain();
-}
-
-CCString HCharactorsBase::getCPath()
-{
-	if(characPath){
-	return (*characPath);
-	}
-	return ("NULL");
-}
-
-void HCharactorsBase::addImageUsingTextureCache( const char * cPath)
-{
-	CCTexture2D*textureR=CCTextureCache::sharedTextureCache()->addImage(cPath);
-	texture=textureR;
+	texture = Director::getInstance()->getTextureCache()->addImage(cPath);
+	
 	texture->retain();
-	characPath=CCString::createWithContentsOfFile(cPath);
-	characPath->retain();
-	TextureSpriteFrame=CCArray::create();
-	TextureSpriteFrame->retain();
-	walkDown=CCArray::create();
-	walkDown->retain();
-	walkLeft=CCArray::create();
-	walkLeft->retain();
-	walkRight=CCArray::create();
-	walkRight->retain();
-	walkUp=CCArray::create();
-	walkUp->retain();
+	//characPath = CCString::createWithContentsOfFile(cPath);
+	//characPath->retain();
 }
 
-CCArray* HCharactorsBase::insertTextureSpriteFrames(float width,float height,int row,int column)
+void HCharactorsBase::insertTextureSpriteFrames(float width, float height, int row, int column)
 {
-	for(int rCount=0;rCount<=row-1;rCount++)
+	auto selectVector=[this](int jNum)->Vector<SpriteFrame*>&
 	{
-		for(int cCount=0;cCount<=column-1;cCount++)
+		switch (jNum)
 		{
-			CCSpriteFrame *frame0 = CCSpriteFrame::createWithTexture(this->texture, CCRectMake(width*cCount, height*rCount,width, height));
-			this->TextureSpriteFrame->addObject(frame0);
+			case 0: return vWalkDown;
+			case 1: return vWalkLeft;
+			case 2: return vWalkRight;
+			case 3: return vWalkUp;
+			default: log("error"); 
 		}
-	}
-	int n=0;
-	auto forWalk=[&n,this,column](CCArray*sub){
-		int ub=n+column-1;
-		for(;n<=ub;n++){
-			sub->addObject(TextureSpriteFrame->objectAtIndex(n));
-			
+	};
+	for (int rCount = 0; rCount <= row - 1; rCount++)
+	{
+	     auto &frameVector = selectVector(rCount);
+		for (int cCount = 0; cCount <= column - 1; cCount++)
+		{
+			auto *frame0 = SpriteFrame::createWithTexture(this->texture, Rect(width*cCount, height*rCount, width, height));
+			frameVector.pushBack(frame0);
 		}
-		sub->addObject(TextureSpriteFrame->objectAtIndex(n-column));};
 
-	forWalk(walkDown);
-	forWalk(walkLeft);
-	forWalk(walkRight);
-	forWalk(walkUp);
-	return this->TextureSpriteFrame;
+	}
+	
 }
 
-int HCharactorsBase::directionCal(CCPoint currentPos,CCPoint targetPos)
+int HCharactorsBase::directionCal(Vec2 currentPos, Vec2 targetPos)
 {
 	int direction;
-	if(targetPos.x>= currentPos.x)
+	if (targetPos.x >= currentPos.x)
 	{
-		if(targetPos.y>= currentPos.y)
+		if (targetPos.y >= currentPos.y)
 		{
-			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))>=1)
+			if (((targetPos.x - currentPos.x) / (targetPos.y - currentPos.y)) >= 1)
 			{
-				direction=3;
+				direction = 3;
 			}
 			else
 			{
-				direction=4;
+				direction = 4;
 			}
 		}
-		else{
-			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))<=-1)
+		else {
+			if (((targetPos.x - currentPos.x) / (targetPos.y - currentPos.y)) <= -1)
 			{
-				direction=3;
+				direction = 3;
 			}
 			else
 			{
-				direction=1;
+				direction = 1;
 			}
 		}
-	  }
-	
-	else{
-		if(targetPos.y>= currentPos.y)
+	}
+
+	else {
+		if (targetPos.y >= currentPos.y)
 		{
-			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))<=-1)
+			if (((targetPos.x - currentPos.x) / (targetPos.y - currentPos.y)) <= -1)
 			{
-				direction=2;
+				direction = 2;
 			}
 			else
 			{
-				direction=4;
+				direction = 4;
 			}
 		}
-		else{
-			if(((targetPos.x- currentPos.x)/(targetPos.y- currentPos.y))>=1)
+		else {
+			if (((targetPos.x - currentPos.x) / (targetPos.y - currentPos.y)) >= 1)
 			{
-				direction=2;
+				direction = 2;
 			}
-			else{
-				direction=1;
+			else {
+				direction = 1;
 			}
-		} 
+		}
 	}
 	return direction;
 }
@@ -137,228 +108,142 @@ int HCharactorsBase::directionCal(CCPoint currentPos,CCPoint targetPos)
 
 void HCharactorsBase::setInitialTexture()
 {
-	CCSpriteFrame* sub=(CCSpriteFrame*)TextureSpriteFrame->objectAtIndex(0);
+	auto sub = vWalkDown.at(0);
 	this->setTexture(sub->getTexture());
 	this->setTextureRect(sub->getRect());
 }
 
 
-CCArray* HCharactorsBase::sendDirectionArray(int num)
-{
-	switch(num)
-	{
-	case 1: return walkDown;
-	case 2: return walkLeft;
-	case 3: return walkRight;
-	case 4: return walkUp;
-	default: return NULL;
-	}
-}
+ 
 
 
+ 
+ bool MainCharactor::initWithPictureList(const char* pictureListPath, float subWidth, float subHeight, int row, int column)
+ {
+	 if (!HCharactorsBase::initWithPictureList(pictureListPath,subWidth,subHeight,row,column))
+	 {
+		 return false;
+	 }
+	 
+	 return true;
+ }
 
-bool MainCharactor::init(void)
-{
-	if(!HCharactorsBase::init())
+ Action* MainCharactor::runWalkingAnimation(Vec2 clickPoint, Vec2 currentPoint)
+ {
+	
+	 int direction;// down=1,left=2,right=3,up=4
+	 direction = directionCal(currentPoint, clickPoint);
+	 auto walkingAnimation=this->runAction(vWalkingAnimation.at(direction-1));
+	 return walkingAnimation;
+ }
+
+ 
+ Action* MainCharactor::createWalkingAction(Vec2 clickPoint, Vec2 currentPoint)
+ {
+	 float cSpeed = currentPoint.getDistance(clickPoint) / 80.0;
+	 auto walkingAnimation = this->runWalkingAnimation(clickPoint, currentPoint);
+	 auto afterCast = reinterpret_cast<Node*>(walkingAnimation);
+	 auto stopCB = CallFuncN::create(std::bind(stopWalkingAnimation,afterCast));
+	 int a = 4;
+	 auto moveTo = MoveTo::create(cSpeed, clickPoint);
+	 auto finalAction= this->runAction(Sequence::create(moveTo, stopCB, nullptr));
+	 return finalAction;
+	 
+ }
+
+ Vec4 MainCharactor::judgeIfTouchObstacles()
+ {
+	 float pX = this->getPositionX();
+	 float pY = this->getPositionY();
+	 Vec4 obsReturnPos=Vec4(0,0,0,0);
+	
+	 for (auto obsInfo : (*obstaclesForCharactor))
+	 {
+		 int jLx = obsInfo["left"];
+		 int jRx = obsInfo["right"];
+		 int jUy = obsInfo["up"];
+		 int jDy = obsInfo["down"];
+
+		 if ((pX >= jLx) && (pX <= jRx) && (pY >= jDy) && (pY <= jUy))
+		 {
+			 this->stopAllActions();
+			 this->setPosition(savePoint);
+			 obsReturnPos = Vec4(jLx, jRx, jDy, jUy);
+			 break;
+		 }
+	 }
+	 savePoint = Vec2(pX, pY);
+
+
+	 return obsReturnPos;
+ }
+
+ 
+
+bool NPC::initWithPictureList(const char* pictureListPath, float subWidth, float subHeight, int row, int column)
+ {
+	if (!HCharactorsBase::initWithPictureList(pictureListPath, subWidth, subHeight, row, column))
 	{
 		return false;
 	}
-	reciever=CCArray::create();
-    reciever->retain();
+
 	return true;
-}
+ }
 
-CCActionInterval* MainCharactor::walkingAnimation(CCPoint clickPoint, CCPoint currentPoint)
+bool NPC::setNPCMovement(Vec2 a, ...)
 {
-	if(reciever)reciever->removeAllObjects();
-	int direction;// down=1,left=2,right=3,up=4
-	direction=directionCal(currentPoint,clickPoint);
-	CCAnimation *animation = CCAnimation::createWithSpriteFrames(sendDirectionArray(direction), 0.2f);
-    CCAnimate *animate = CCAnimate::create(animation);
-    CCActionInterval* seq = CCSequence::create( animate,NULL);
-    CCActionInterval* final=CCRepeatForever::create( seq );
-	//tag 01
-	final->setTag(01);
-	return final;
-}
+	//ActionInterval*blank = ActionInterval::
+	//CCArray* actionGroup = CCArray::create();
+	Vector<FiniteTimeAction*> actionVec;
+	Vec2 substitute = a;
+	va_list cvar;
+	va_start(cvar, a);
 
-
-void MainCharactor::stopForConversation(HCharactorsBase*target)
-{
-	CCPoint mCh=this->getPosition();
-	CCPoint targetPos=target->getPosition();
-	this->stopAllActions();
-	target->stopAllActions();
-	((NPC*)target)->ifSetConversationOn(true);
-	((NPC*)target)->setTextIntoBox();
-}
-
-
-bool NPC::setNPCMovement(CCPoint a,...)
-{
-	CCActionInterval*blank=CCActionInterval::create(2.0f);
-	CCArray* actionGroup=CCArray::create();
-	CCPoint substitute=a;
-	 va_list cvar;  
-    va_start (cvar, a);
-	
-	auto actionCreate=[this,actionGroup,blank](CCPoint cPos,CCPoint tPos){
-		float speed=tPos.getDistance(cPos)/80;
-		CCArray *moveFrames=sendDirectionArray(directionCal(cPos,tPos));
-		CCActionInterval*moveTo=CCMoveTo::create(speed,tPos);
-		CCAnimation*animation=CCAnimation::createWithSpriteFrames(moveFrames,0.2);
-		CCAnimate*animate=CCAnimate::create(animation);
-		int times=moveTo->getDuration()/animate->getDuration()+1;
-		CCRepeat*repeat=CCRepeat::create(animate,times);
-		moveTo->setDuration(times*animate->getDuration());
-		CCSpawn*spawn=CCSpawn::create(moveTo,repeat,NULL);
-		actionGroup->addObject(spawn);
-		actionGroup->addObject(blank);
-
+	auto determineSpriteFrameVec = [this](int index){
+		switch (index){
+		case 1: return &vWalkDown;
+		case 2: return &vWalkLeft;
+		case 3: return &vWalkRight;
+		case 4: return &vWalkUp;
+		default: CCLOG("error");
+		}
 	};
-		while(1)
+	auto delay = DelayTime::create(1.0f);
+	auto actionCreate = [this, &actionVec,determineSpriteFrameVec,delay](Vec2 cPos, Vec2 tPos) {
+		float speed = tPos.getDistance(cPos) / 80;
+		//CCArray *moveFrames = sendDirectionArray(directionCal(cPos, tPos));
+		int direction = directionCal(cPos, tPos);
+		auto walkFrames = determineSpriteFrameVec(direction);
+		auto moveTo = MoveTo::create(speed, tPos);
+		auto animation = Animation::createWithSpriteFrames(*walkFrames, 0.2);
+		auto animate = Animate::create(animation);
+		int times = moveTo->getDuration() / animate->getDuration() + 1;
+		auto repeat = Repeat::create(animate, times);
+		moveTo->setDuration(times*animate->getDuration());
+		auto spawn = Spawn::create(moveTo, repeat, NULL);
+		actionVec.pushBack(spawn);
+		actionVec.pushBack(delay);
+	  };
+	while (true)
+	{
+		Vec2 ref = va_arg(cvar, Vec2);
+		if (ref.equals(a))
 		{
-			CCPoint ref=va_arg(cvar,CCPoint);
-			if(ref.equals(a))
-			{
-				va_end(cvar);
-				break;
-			}
-			actionCreate(substitute,ref);
-			substitute=ref;
+			va_end(cvar);
+			break;
 		}
-	
-	actionCreate(substitute,a);
-	
-	if(NULL==this)
+		actionCreate(substitute, ref);
+		substitute = ref;
+	}
+
+	actionCreate(substitute, a);
+
+	if (NULL == this)
 	{
 		return false;
 	}
-	CCSequence*sequence=CCSequence::create(actionGroup);
-	CCRepeatForever*action=CCRepeatForever::create(sequence);
+	auto sequence = Sequence::create(actionVec);
+	auto action = RepeatForever::create(sequence);
 	this->runAction(action);
-
 	return true;
-}
-
-bool NPC::init(trial* NPCobj)
-{
-	if(!HCharactorsBase::init())
-	{
-		return false;
-	}
-	H_delete=NPCobj;
-	count=-1;
-	_ifBoxOn=false;
-	_ifOnConversation=false;
-
-	
-	textBox=CCSprite::create("textBox.png");
-	textBox->setScale(0.4f);
-	textBox->setVisible(false);
-	addChild(textBox,1);
-
-	textGroup=NPCobj->sendTextsArray();
-	const char*name=NPCobj->returnName();
-	NPCnameLabel= CCLabelTTF::create(name, "A Damn Mess.ttf", 26,  
-                                          CCSize(800,200), kCCTextAlignmentLeft, kCCVerticalTextAlignmentCenter);
-	NPCnameLabel->setVisible(false);
-	NPCnameLabel->setPosition(ccp(100,100));
-	NPCnameLabel->setScale(0.6);
-	addChild(NPCnameLabel,2);
-	return true;
-}
-
-void NPC::setTextContentByArray()
-{  
-	CCObject*son=NULL;
-	CCObject*grandson=NULL;
-	CCLayer*y1=(CCLayer*)( this->getParent());
-	CCNode*y2=(CCNode*)(y1->getParent());
-	CCARRAY_FOREACH(textGroup,son)
-	{
-		CCArray*texts=(CCArray*)son;
-		
-		int yDistance=160;
-		CCARRAY_FOREACH(texts,grandson)
-		{
-			CCLabelTTF*final=(CCLabelTTF*)grandson;
-			final->setPosition(ccp(328,yDistance));
-			yDistance-=10;
-			final->setScale(0.5);
-			final->setVisible(false);
-			
-			y2->getPosition();
-			y2->addChild(final,10);
-		}
-	    count++;
-	}
-	scale=count;
-	
-}
-
-void NPC::setTextIntoBox()
-{
-	if((count)!=-1)
-	{
-		CCObject*sub=NULL;
-		NPCnameLabel->setPosition((ccp(395,235)-this->getPosition()));
-		NPCnameLabel->setVisible(true);
-		CCARRAY_FOREACH((CCArray*)(textGroup->objectAtIndex(scale-count)),sub)
-		{
-			CCLabelTTF* rece=(CCLabelTTF*)sub;
-			rece->setVisible(true);
-		}
-	_ifBoxOn=true;
-	textBox->setPosition((ccp(300,200)-this->getPosition()));
-	textBox->setVisible(true);
-	}
-	else
-	{
-		
-		ifSetConversationOn(false);
-		count=scale;
-	}
-}
-
-bool NPC::ifAndSetBoxStatus()
-{
-	if(_ifBoxOn)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-void NPC::setTextOffBox()
-{
-	CCObject*sub=NULL;
-		CCARRAY_FOREACH((CCArray*)(textGroup->objectAtIndex(scale-count)),sub)
-	{
-		CCLabelTTF* rece=(CCLabelTTF*)sub;
-		rece->setVisible(false);
-	}
-	count--;
-	textBox->setVisible(false);
-	_ifBoxOn=false;
-}
-
-void NPC::ifSetConversationOn(bool ifOn)
-{
-	if(ifOn)
-	{
-		_ifOnConversation=true;
-	}
-	else
-	{
-		_ifOnConversation=false;
-	}
-}
-
-bool NPC::iSConservationOn()
-{
-	return _ifOnConversation;
 }

@@ -1,200 +1,257 @@
 #ifndef __H_CHARACTORS_H__
 #define __H_CHARACTORS_H__
 #include"cocos2d.h"
-#include"HNPCTexts.h"
-using namespace cocos2d;
+#include"HMaps.h"
+USING_NS_CC;
 
-/***********************************************************
-Warning: 
-Most of the functions or methods are not perfect currently,which need many corrections.
-Their existence is to work properly and simply during the testing period.
-警告：
-大多数函数和方法目前都不是完美的，在后期将会大改动，
-他们目前存在的原因是因为在前期能比较简单的测试
-************************************************************/
-
-//class HCharactorBase, which serves as the base class of all Charactors subclasses.
-class HCharactorsBase:public CCSprite
+/** define
+* class HCharactorBase, which serves as the base class of all Charactors subclasses.
+*/
+class HCharactorsBase :public Sprite
 {
 public:
+   /**
+	* init by the giving argument list
+	*  @param const char*  pictureListPath the address of the picture
+	*  @param float subWidth the width between each frame
+	*  @param float subHeight the height between each frame
+	*  @param int row the number of rows in the picture
+	*  @param int row the number of columns in the picture
+	*  @return if success
+	*/
+	virtual bool initWithPictureList(const char* pictureListPath, float subWidth, float subHeight, int row, int column);
+
+protected:
+   /**
+	* There are four vectors each includes a set of walking frames on one direction
+	* 下面是4个容器，每个数组都涵盖了在某个方向上行走的一系列图片帧
+	*/
+	Vector<SpriteFrame*>vWalkUp;
+	Vector<SpriteFrame*>vWalkDown;
+	Vector<SpriteFrame*>vWalkLeft;
+	Vector<SpriteFrame*>vWalkRight;
+
+	/** @brief vector includes walkingAnimation down=1,left=2,right=3,up=4 */ 
+	Vector<RepeatForever*>vWalkingAnimation;
 	
-	//two segments create method Seg1:
-	static HCharactorsBase* create()
-	{
-		HCharactorsBase* pRet = new HCharactorsBase();
-		if (pRet != NULL&&pRet->init())
-     {
-        pRet->autorelease();
-		return pRet;
-	 }
-		else
-	 {
-		delete pRet;
-		pRet=NULL;
-		return NULL;
-	 }
-	}
+   /**
+	* calculate the direction by the giving points
+	*  @param Vec2 currentPos The current position of Charactor
+	*  @param Vec2 currentPos The target position for Charactor to move
+	*  @return the direction according to down=1,left=2,right=3,up=4
+	*/
+	int directionCal(Vec2 currentPos, Vec2 targetPos);
 
-	//two segments create method Seg2:
-	virtual bool init(void);
-
-	//At present it is useless, need more supplementaries
-	//此函数目前禁用，待补充
-	void setCPath(std::string cPath);
-
-	//At present it is useless, need more supplementaries
-	//此函数目前禁用，待补充
-	CCString getCPath();
-
-	//Currently the following 3 functions are the only way to insert image into Charactors. The picture should be the assembly of a set of movement.
-	//下面的三个函数是目前唯一添加人物图片的方法，使用的图片应为一系列动作图片的集合
-	/*Example to insert piction:
-	NPC1=NPC::create(new Maid());
-	NPC1->addImageUsingTextureCache("maid.png");
-	NPC1->insertTextureSpriteFrames(32,48,4,4);
-	NPC1->setInitialTexture();*/
+protected:
 	
-	//Function1: addImage by picture path
+
+private:
+   /**
+	*  add Image by using the TextureCache. This function would implement automatically in the function "initWithPictureList"
+	*  @param const char *cPath The path of the image
+	*/
 	void addImageUsingTextureCache(const char *cPath);
 
-	//Function2: insert textureSriteFrames by manually setting the arguments of spaces among subpictures
-	//手动设置子图片间的距离
-	CCArray* insertTextureSpriteFrames(float width,float height,int row,int column);
+   /**
+	* Function2: insert textureSriteFrames by manually setting the arguments of spaces among subpictures. This function would implement automatically in the function "initWithPictureList"
+	*  @param float width the width between each frame
+	*  @param float height the height between each frame
+	*  @param int row the number of rows in the picture
+	*  @param int row the number of columns in the picture
+	*/
+    void insertTextureSpriteFrames(float width, float height, int row, int column);
 
-	//Function3: set initial (or static) picture for the Charactor
-	//手动设置人物的静止时的图片
+	/**
+	*  Function3: set initial (or static) picture for the Charactor. This function would implement automatically in the function "initWithPictureList"
+	*/
 	void setInitialTexture();
 
-	
-	
-	
-protected:
-	//There are four arrays each includes a set of walking items on one direction
-	//下面是4个数组，每个数组都涵盖了在某个方向上行走的一些列图片帧
-	CCArray *walkUp;
-	CCArray *walkDown;
-	CCArray *walkLeft;
-	CCArray*walkRight;
 
-	// obtain the direction the Charactor should go, while 1,2,3,4 represent down,left,right,up: down=1,left=2,right=3,up=4
-    int directionCal(CCPoint currentPos, CCPoint targetPos);
+	/**
+	*  create and put the Animations into the vWalkingAnimation by the giving Vector<SpriteFrame*>
+	*  Vector<SpriteFrame*> &sub the spriteFrame Vector
+	*/
+	inline void setEachAnimaVec(Vector<SpriteFrame*> &sub)
+	{
+		auto animation = Animation::createWithSpriteFrames(sub, 0.2f);
+		auto animate = Animate::create(animation);
+		auto * seq = Sequence::create(animate, NULL);
+		auto * forever = RepeatForever::create(seq);
+		vWalkingAnimation.pushBack(forever);
+	}
 
-	// using the num for direction to require the corresponding array, still down=1,left=2,right=3,up=4
-	CCArray*sendDirectionArray(int num);
+	/**
+	*  set all SpriteFrames Vectors into vWalkingAnimation
+	*/
+	inline void setAnimationVector()
+	{
+		setEachAnimaVec(vWalkDown);
+		setEachAnimaVec(vWalkLeft);
+		setEachAnimaVec(vWalkRight);
+		setEachAnimaVec(vWalkUp);
+	}
 
-	// texture2D for the static picture of the Charactor
-	CCTexture2D*texture;
-
-	//useless currently
-	CCString *characPath;
-
-	//array includes total TextureSpriteFrames
-	CCArray * TextureSpriteFrame;
-	
-	
-private:
-	
+	/** @brief the initial image of the Charactor */
+	Texture2D* texture;
 };
 
 
-// class for main Charactor
-class MainCharactor: public HCharactorsBase
+
+/** define
+* class MainCharactor
+*/
+
+class MainCharactor : public HCharactorsBase
 {
 public:
-	static MainCharactor* create()
+	static MainCharactor* create(const char* pictureListPath, float subWidth, float subHeight, int row, int column)
 	{
 		MainCharactor* pRet = new MainCharactor();
+
+		if (pRet != NULL&&pRet->initWithPictureList(pictureListPath, subWidth, subHeight, row, column))
+		{
 		
-		if (pRet != NULL&&pRet->init())
-        {
-           pRet->autorelease();
-		   return pRet;
+			pRet->autorelease();
+			return pRet;
 		}
 		else
 		{
 			delete pRet;
-			pRet=NULL;
+			pRet = NULL;
 			return NULL;
 		}
 	}
 
-	virtual bool init(void);
-	// Insert the walking animation to the Charactor. 
-	CCActionInterval* walkingAnimation(CCPoint clickPoint, CCPoint currentPoint);
-
-	//only call when the Charactor stops to conduct a conversation.
-	void stopForConversation(HCharactorsBase*target);
+   /**
+	*  init by the giving argument list
+	*  @param const char*  pictureListPath the address of the picture
+	*  @param float subWidth the width between each frame
+	*  @param float subHeight the height between each frame
+	*  @param int row the number of rows in the picture
+	*  @param int row the number of columns in the picture
+	*  @return if success
+	*/
+	virtual bool initWithPictureList(const char* pictureListPath, float subWidth, float subHeight, int row, int column) override;
 	
+   /**
+	*  run the walkingAction of mainCharator by the giving Points
+	*  @param Vec2 currentPos The current position of mainCharactor
+	*  @param Vec2 currentPos The target position for mainCharactor to move
+	*  @return the walkingAction
+	*/
+	Action* runWalkingAnimation(Vec2 clickPoint, Vec2 currentPoint);
+
+   /**
+	*  create the walkingAction of mainCharator by the giving Points
+	*  @param Vec2 currentPos The current position of mainCharactor
+	*  @param Vec2 currentPos The target position for mainCharactor to move
+	*  @return the walkingAction
+	*/
+	Action* createWalkingAction(Vec2 clickPoint,Vec2 currentPoint );
+
+	/** @brief Function which MainCaractor->stopAction  */
+    std::function<void(Node*)> stopWalkingAnimation = [this](Node* walkingAnimation)
+	{
+		auto removeCast =reinterpret_cast<Action*>(walkingAnimation);
+		this->stopAction(removeCast);
+	};
+
+	//second way
+	/*std::function<void()> stopWalkingAnimation = [this]()
+	{
+		
+		this->stopActionByTag(1);
+	};*/
+
+   /**
+	*  set Obstacles for the mainCharactor from a giving obstacles vector
+	*  @param std::vector<std::map<std::string, float>>* obstaclesVec a obstacles vector
+	*/
+	inline void setObsForCharac(std::vector<std::map<std::string, float>>* obstaclesVec)
+	{
+		obstaclesForCharactor = obstaclesVec;
+		setHUpdateOn(true);
+	}
+
+   /**
+	*  set Obstacles for the mainCharactor from a giving obstacles vector
+	*  @return the obstacles coordinate mainCharactor hit
+	*/
+	Vec4 judgeIfTouchObstacles();
+
+	/**
+	*  If set HUpdateOn 
+	*  @param bool ifOn true=on, false=off
+	*/
+	inline void setHUpdateOn(bool ifOn)
+	{
+		if (ifOn) {
+			schedule(HUpdate, 0.01f, "judgeIfHitObstacles");
+		}
+		else {
+			unschedule("judgeIfHitObstacles");
+			
+		}
+	}
 private:
-	enum Direction
-	{up=0,down,left,right};
-	CCArray*reciever;
+	Vec2 savePoint;
+
+	/** @brief updating lambda function  */
+	std::function<void(float)> HUpdate = [this](float m){
+		judgeIfTouchObstacles();
+	};
+	std::vector<std::map<std::string, float>>* obstaclesForCharactor;
+	
 };
 
 
-class NPC:public HCharactorsBase
+
+/** define
+* class NPC
+*/
+class NPC :public HCharactorsBase
 {
 public:
-	
-	virtual bool init(trial*NPCobj);
 
-	static NPC* create(trial*name)
+	/**
+	* init by the giving argument list
+	*  @param const char*  pictureListPath the address of the picture
+	*  @param float subWidth the width between each frame
+	*  @param float subHeight the height between each frame
+	*  @param int row the number of rows in the picture
+	*  @param int row the number of columns in the picture
+	*  @return if success
+	*/
+	virtual bool initWithPictureList(const char* pictureListPath, float subWidth, float subHeight, int row, int column) override;
+
+	static NPC* create(const char* pictureListPath, float subWidth, float subHeight, int row, int column)
 	{
 		NPC* pRet = new NPC();
-		
-		if (pRet != NULL&&pRet->init(name))
-        {
-           pRet->autorelease();
-		   return pRet;
-		 }
+
+		if (pRet != NULL&&pRet->initWithPictureList(pictureListPath, subWidth, subHeight, row, column))
+		{
+			pRet->autorelease();
+			return pRet;
+		}
 
 		else
 		{
 			delete pRet;
-			pRet=NULL;
+			pRet = NULL;
 			return NULL;
 		}
 	}
 
-	//This function enables the NPC to move automatically according to the points set you send to them.
-	//这个函数能使NPC自动沿着你给的点集合移动，类似于口袋妖怪中的NPC
-	 bool setNPCMovement(CCPoint a,...);
+	/**
+	*  This function enables the NPC to move automatically according to the points set you send to them.
+	*  @param Vec2 a first position of NPC
+	*  @param var pos a series of points which NPC moves along with
+	*  @return if success
+	*/
+	bool setNPCMovement(Vec2 a, ...);
+
 	
-	// the following six functions are to conduct the dialog box and dialog texts Warning：this function is incomplete, where bugs exist
-	//以下的六个函数处理对话框和对话文字，此功能尚不完善，有bug
-	void setTextIntoBox();
-	void setTextContentByArray();
-	void setTextOffBox();
-	void ifSetConversationOn(bool On);
-	bool iSConservationOn();
-	bool ifAndSetBoxStatus();
-
-	CCArray* textGroup;
-	int count;
-	int scale;
-	bool _ifBoxOn;
-	bool _ifOnConversation;
-	CCLabelTTF * NPCnameLabel;
-	CCSprite*textBox;
-
-	~NPC()
-	{
-		CCSprite::~CCSprite();
-		delete H_delete;
-	}
-private:
-	trial* H_delete;
 };
-
-
-
-
-
-
-
-
-
-
 
 
 #endif //__H_CHARACTORS_H__

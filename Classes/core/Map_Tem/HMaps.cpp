@@ -1,116 +1,96 @@
 #include"HMaps.h"
 
-TmxLayer* TmxLayer::create()
+HTMXManager* HTMXManager::create()
 {
-	TmxLayer*pRet=new TmxLayer();
+	HTMXManager*pRet = new HTMXManager();
 
-	if (pRet && pRet->init()) 
-    { 
-        pRet->autorelease(); 
-		
-        return pRet; 
-    } 
-    else 
-    { 
-        delete pRet; 
-        pRet = NULL; 
-        return NULL; 
-    } 
-}
-TmxLayer* TmxLayer::create(const char*mapPath)
-{
-	TmxLayer*pRet=new TmxLayer();
-
-	if (pRet && pRet->init()) 
-    { 
-        pRet->autorelease(); 
-		pRet->setMapPath(mapPath);
-		pRet->mH=(pRet->map->getMapSize().height)*(pRet->map->getTileSize().height);
-		pRet->mW=(pRet->map->getMapSize().width)*(pRet->map->getTileSize().width);
-        return pRet; 
-    } 
-    else 
-    { 
-        delete pRet; 
-        pRet = NULL; 
-        return NULL; 
-    } 
-}
-
-void TmxLayer::setAntiAliasforMapChildren()
-{
-	 CCArray* pChildrenArray = map->getChildren();  
-     CCSpriteBatchNode* child = NULL;  
-     CCObject* pObject = NULL;  
-     CCARRAY_FOREACH(pChildrenArray, pObject)  
-     {  
-         child = (CCSpriteBatchNode*)pObject;  
-	     if(!child)  
-         break;  
-		 child->getTexture()->setAntiAliasTexParameters();  
-       }  
-}
-
-CCArray* TmxLayer::addObstacle(const char*objectGroupName,const char*objectName)
-{
-	if(!obstacles)
+	if (pRet && pRet->init())
 	{
-		obstacles=CCArray::create();
-		obstacles->retain();
+		pRet->autorelease();
+
+		return pRet;
 	}
-	CCTMXObjectGroup* objGroup = map->objectGroupNamed(objectGroupName); 
-	CCDictionary*obj= objGroup->objectNamed(objectName);
-	obstacles->addObject(obj);
+	else
+	{
+		delete pRet;
+		pRet = NULL;
+		return NULL;
+	}
+}
+HTMXManager* HTMXManager::create(const char*mapPath)
+{
+	HTMXManager*pRet = new HTMXManager();
 
-	//add object's limits of collision : up,down,left and right
-	int Lx=((CCString*)obj->objectForKey("x"))->intValue();
-			
-	int Rx=((CCString*)obj->objectForKey("width"))->intValue()+Lx;
-
-	int Dy=((CCString*)obj->objectForKey("y"))->intValue();
-		
-    int Uy=Dy+(((CCString*)obj->objectForKey("height"))->intValue());
-			
-	AddiTionDictionary*limits=AddiTionDictionary::create();
-	limits->setCollisionLimit(Uy,Dy,Rx,Lx);
-	obj->setObject(limits,"limits");
-
-	return obstacles;
-		
+	if (pRet && pRet->init())
+	{
+		pRet->autorelease();
+		pRet->setMapPath(mapPath);
+		pRet->mH = (pRet->map->getMapSize().height)*(pRet->map->getTileSize().height);
+		pRet->mW = (pRet->map->getMapSize().width)*(pRet->map->getTileSize().width);
+		return pRet;
+	}
+	else
+	{
+		delete pRet;
+		pRet = NULL;
+		return NULL;
+	}
 }
 
-CCArray* TmxLayer::addObstacles(const char*objectGroupName)
+void HTMXManager::setAntiAliasforMapChildren()
 {
-	
-	//!!!!!!!!!!
-	CCTMXObjectGroup* objGroup = map->objectGroupNamed(objectGroupName); 
-	
-	//add objects' limits of collision : up,down,left and right
-	CCObject*subject=NULL;
-	CCARRAY_FOREACH(objGroup->getObjects(),subject)
-   {
-	   CCDictionary*obj=(CCDictionary*)subject;
-	   int Lx=((CCString*)obj->objectForKey("x"))->intValue();
-			
-	  int Rx=((CCString*)obj->objectForKey("width"))->intValue()+Lx;
-
-	  int Dy=((CCString*)obj->objectForKey("y"))->intValue();
-		
-      int Uy=Dy+(((CCString*)obj->objectForKey("height"))->intValue());
-			
-	  AddiTionDictionary*limits=AddiTionDictionary::create();
-	  limits->retain();
-	  limits->setCollisionLimit(Uy,Dy,Rx,Lx);
-	  obj->setObject(limits,"limits");
-	 }
-	
-	obstacles->addObjectsFromArray(objGroup->getObjects());
-	
-	return obstacles;
+	auto pChildrenVec = map->getChildren();
+	for (auto pObject : pChildrenVec)
+	{
+		((SpriteBatchNode*)pObject)->getTexture()->setAntiAliasTexParameters();
+	}
 }
 
-CCArray* TmxLayer::getObstacles()
+void HTMXManager::addObstacle(const char*objectGroupName, const char*objectName)
 {
-	int a=0;
-	return obstacles;
+	auto* objGroup = map->getObjectGroup(objectGroupName);
+	auto obj = objGroup->getObject(objectName);
+
+	int Lx = (obj.at("x")).asInt();
+	int Rx = (obj.at("width")).asInt() + Lx;
+	int Dy = (obj.at("y")).asInt();
+	int Uy = Dy+(obj.at("height")).asInt();
+	
+	
+	obstacleInfo["up"] = Uy;
+	obstacleInfo["down"] = Dy;
+	obstacleInfo["right"] = Rx;
+	obstacleInfo["left"] = Lx;
+	obstaclesVec.push_back(obstacleInfo);
+	obstacleInfo.clear();
+}
+
+void HTMXManager::addObstacles(const char*objectGroupName)
+{
+
+	
+	auto* objGroup = map->getObjectGroup(objectGroupName);
+	auto objects = objGroup->getObjects();
+	
+	for (auto obj : objects)
+	{
+		int Lx = (obj.asValueMap().at("x")).asInt();
+		int Rx = (obj.asValueMap().at("width")).asInt() + Lx;
+		int Dy = (obj.asValueMap().at("y")).asInt();
+		int Uy = Dy + (obj.asValueMap().at("height")).asInt();
+
+		//std::map<std::string, float> obstacleInfo;
+		obstacleInfo["up"] = Uy;
+		obstacleInfo["down"] = Dy;
+		obstacleInfo["right"] = Rx;
+		obstacleInfo["left"] = Lx;
+		obstaclesVec.push_back(obstacleInfo);
+		obstacleInfo.clear();
+	}
+
+}
+
+ std::vector<std::map<std::string, float>>* HTMXManager::getObstacles()
+{
+	return &obstaclesVec;
 }

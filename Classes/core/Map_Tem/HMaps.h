@@ -1,124 +1,93 @@
 #ifndef __H_MAPS_H_
 #define __H_MAPS_H_
 #include"cocos2d.h"
-#include"HCharactors.h"
 using namespace cocos2d;
-class AddiTionDictionary: public CCDictionary
+
+
+/** define
+* class MapManagerBase, which serves as the base class of all types of maps
+*/
+class MapManagerBase : public Layer
 {
 public:
-	static AddiTionDictionary* create()
-	{
-		AddiTionDictionary* pRet = new AddiTionDictionary();
-    if (pRet != NULL)
-    {
-        pRet->autorelease();
-    }
-    return pRet;
-	}
 
-	//for up,down,left,right limits
-	int getCollisionLimit(const char*limit)
+	virtual bool init() override
 	{
-		if("up"==limit){
-			return Uy;
+		if (!Layer::init())
+		{
+			return false;
 		}
-		else if("down"==limit){
-			return Dy;
-		}
-		else if("left"==limit){
-			return Lx;
-		}
-		else if("right"==limit){
-			return Rx;
-		}
-		else{
-			return -1;
-		}
-
-	}
-
-	void setCollisionLimit(int pUy,int pDy,int pRx,int pLx)
-	{
-		Uy=pUy;
-		Dy=pDy;
-		Rx=pRx;
-		Lx=pLx;
-	}
-private:
-	int Lx;
-	int Rx;
-	int Uy;
-	int Dy;
-
-};
-class MapLayerBase: public CCLayer
-{
-public:
-	virtual bool init()
-	{
-		if ( !CCLayer::init() )
-    {
-        return false;
-    }
 		return true;
 	}
 };
 
-class TmxLayer: public MapLayerBase
+
+
+/** define
+* class HTMXManager manages TMX maps
+*/
+class HTMXManager : public MapManagerBase
 {
 public:
-	virtual bool init()
+	virtual bool init() override
 	{
-		
-		if ( !MapLayerBase::init() )
-    {
-        return false;
-    }
+
+		if (!MapManagerBase::init())
+		{
+			return false;
+		}
 		return true;
 	}
 
-	static TmxLayer* create();
-	static TmxLayer* create(const char* mapPath);
+	static HTMXManager* create();
+	static HTMXManager* create(const char* mapPath);
 
-	void setMapPath(const char*mapPath)
+	inline void setMapPath(const char*mapPath)
 	{
-		map=CCTMXTiledMap::create(mapPath);
-		mH=(map->getMapSize().height)*(map->getTileSize().height);
-		mW=(map->getMapSize().width)*(map->getTileSize().width);
-		obstacles=CCArray::create();
-		obstacles->retain();
+		map = TMXTiledMap::create(mapPath);
+		mH = (map->getMapSize().height)*(map->getTileSize().height);
+		mW = (map->getMapSize().width)*(map->getTileSize().width);
 	}
 
 	void setAntiAliasforMapChildren();
 
-	CCArray* addObstacle(const char*objectGroupName,const char*objectName);
+	/**
+	*  add an Obstacle from an object group of the map into std::vector<std::map<std::string, float>> obstaclesVec;
+	*  @param const char*objectGroupName ObjectGroup's name
+	*  @param const char*objectName object's name
+	*/
+	void addObstacle(const char*objectGroupName, const char*objectName);
 
-	CCArray* addObstacles(const char*objectGroupName);
+	/**
+	*  automatically add Obstacles from an object group of the map into std::vector<std::map<std::string, float>> obstaclesVec;
+	*  @param const char*objectGroupName ObjectGroup's name
+	*/
+	void addObstacles(const char*objectGroupName);
 
-	void setObstaclesTrue(bool n);
+    std::vector<std::map<std::string, float>>* getObstacles();
 
-	CCArray* getObstacles();
+	inline TMXTiledMap *getMap()
+	{
+		return map;
+	}
 
-	CCTMXTiledMap *getMap()
-	 {
-		 return map;
-	 }
-	
-    float getMapWidth()
+	inline float getMapWidth()
 	{
 		return mW;
 	}
 
-	float getMapHeight()
+	inline float getMapHeight()
 	{
 		return mH;
 	}
 
 private:
-	 CCTMXTiledMap *map;
-	 CCArray*obstacles;
-	 float mW;
-	 float mH;
+	//TMXLayer 
+	TMXTiledMap *map;
+	float mW;
+	float mH;
+	std::vector<std::map<std::string, float>> obstaclesVec;
+	std::map<std::string, float> obstacleInfo;
 };
 
 
