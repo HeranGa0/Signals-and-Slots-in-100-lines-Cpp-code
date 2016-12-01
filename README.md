@@ -3,7 +3,7 @@ RPG game template based on cocos2d-c++
 [Documentation could be checked here](https://codedocs.xyz/HeranGa0/HExperiment/index.html)
 
 ## current status:
-1/20 have been completed
+2/20 have been completed
 
 ## important to know
 a. 
