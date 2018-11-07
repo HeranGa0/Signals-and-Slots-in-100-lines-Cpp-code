@@ -2,14 +2,10 @@
 RPG game template based on cocos2d-c++
 [Documentation could be checked here](https://codedocs.xyz/HeranGa0/HExperiment/index.html)
 
-## current status:
-2/20 have been completed
+
 
 ## important to know
-a. 
-  This project is just at the very beginning of development, for why it is lack of most comments, documentations and testing.
-  However, I plan to do the complementariness during this Thanksgiving break.
-b.
+a.
   This program is based on ~~cocos2d-x-2.2.6~~ cocos2d-x-3.13.1 (newest version starts from 11/16/16)
 ## Update information
 ### update1: 
