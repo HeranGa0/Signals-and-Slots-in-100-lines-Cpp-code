@@ -1,6 +1,6 @@
 # cocos2d-c-_RPG_Game_Template
 RPG game template based on Cocos2d-c++ and Cocos Creator (JavaScript)
-[Documentation could be checked here](https://codedocs.xyz/HeranGa0/HExperiment/index.html)
+[Documentation could be checked here](https://codedocs.xyz/HeranGa0/HExperiment/annotated.html)
 
 
 
