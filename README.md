@@ -1,12 +1,12 @@
 # cocos2d-c-_RPG_Game_Template
-RPG game template based on cocos2d-c++
+RPG game template based on Cocos2d-c++ and Cocos Creator (JavaScript)
 [Documentation could be checked here](https://codedocs.xyz/HeranGa0/HExperiment/index.html)
 
 
 
 ## important to know
 a.
-  This program is based on ~~cocos2d-x-2.2.6~~ cocos2d-x-3.13.1 (newest version starts from 11/16/16)
+  This program is based on ~~cocos2d-x-2.2.6~~ cocos2d-x-3.13.1 and Cocos creator (JavaScript)
 ## Update information
 ### update1: 
    Update1 basically ensures that I uploaded the right files.
