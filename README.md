@@ -1,5 +1,5 @@
 # Signals And Slots C++14
-A prototype of Signals & Slots system (unique from Qt implementations) that are used for the communication between objects or widgets (especially in GUI programming). The purpose of this project is for fun so a lot of cool C++ ¡°black magic¡± are used such as the template metaprogramming and macro expansion. This signals&slots implementation was achieved in less then 100 lines of c++ code.
+A prototype of Signals & Slots system (unique from Qt implementations) that are used for the communication between objects or widgets (especially in GUI programming). The purpose of this project is for fun so a lot of cool C++ Â¡Â°black magicÂ¡Â± are used such as the template metaprogramming and macro expansion. This signals&slots implementation was achieved in less then 100 lines of c++ code.
 
 ## Usage:
 **cd .../SignalAndSlot**
@@ -107,4 +107,6 @@ struct Child : public Object
   	//setString will emit stringChanged signal and stringSlot will recieve it and be called
 	obj2.setString("whereamI");
 ```
+## reference
+https://doc.qt.io/qt-5/signalsandslots.html
 
